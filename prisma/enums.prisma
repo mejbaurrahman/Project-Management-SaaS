@@ -1,0 +1,53 @@
+enum UserRole {
+  ADMIN
+  MANAGER
+  MEMBER
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum OrganizationRole {
+  OWNER
+  MANAGER
+  MEMBER
+  GUEST
+}
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  ARCHIVED
+}
+
+enum SprintStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}

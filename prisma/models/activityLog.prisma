@@ -1,0 +1,24 @@
+model ActivityLog {
+  id String @id @default(uuid())
+
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+
+  organizationId String
+  userId         String?
+  taskId         String?
+
+  createdAt DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  task         Task?        @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([taskId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}

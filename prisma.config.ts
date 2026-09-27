@@ -1,16 +1,14 @@
 import "dotenv/config";
-import { definePrismaConfig } from "@prisma/cli-engine";
-import {
-  defineConfig as ormConfig,
-  prisma7Schema,
-} from "@prisma/orm-postgres/config";
+import { defineConfig, env } from "prisma/config";
 
-export default definePrismaConfig({
-  orm: ormConfig({
-    contract: prisma7Schema("prisma"),
-    output: "src/prisma",
-    db: {
-      connection: process.env["DATABASE_URL"]!,
-    },
-  }),
+export default defineConfig({
+  schema: "prisma/schema",
+
+  migrations: {
+    path: "prisma/migrations",
+  },
+
+  datasource: {
+    url: env("DATABASE_URL"),
+  },
 });

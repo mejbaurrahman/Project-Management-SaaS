@@ -1,17 +1,32 @@
-import express, { Application, Request, Response } from "express";
-import cors from "cors";
 import cookieParser from "cookie-parser";
-import helmet from "helmet";
+import cors from "cors";
+import express, {
+  type Application,
+  type Request,
+  type Response,
+} from "express";
+
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+
+import { globalErrorHandler } from "./app/middleware/globalErrorHandler.js";
+import { notFound } from "./app/middleware/notFound.js";
+import { AuthRoutes } from "./app/modules/auth/auth.route.js";
 
 const app: Application = express();
 
 // parsers
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  express.urlencoded({
+    extended: true,
+  }),
+);
+
 app.use(cookieParser());
 
-// security middleware
+// security
 app.use(helmet());
 
 app.use(
@@ -21,7 +36,7 @@ app.use(
   }),
 );
 
-// rate limiter
+// rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 100,
@@ -31,8 +46,9 @@ const limiter = rateLimit({
 
 app.use("/api", limiter);
 
-// health check route
-app.get("/health", (req: Request, res: Response) => {
+app.use("/api/v1/auth", AuthRoutes);
+// health check
+app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({
     success: true,
     message: "TaskFlow API is running",
@@ -42,12 +58,17 @@ app.get("/health", (req: Request, res: Response) => {
   });
 });
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({
     success: true,
     message: "Welcome to TaskFlow Project Management SaaS API",
     data: null,
   });
 });
+
+// must stay after all routes
+app.use(notFound);
+
+app.use(globalErrorHandler);
 
 export default app;

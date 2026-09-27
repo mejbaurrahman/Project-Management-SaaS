@@ -1,17 +1,23 @@
-import dotenv from "dotenv";
 import app from "./app.js";
-
-dotenv.config();
-
-const PORT = process.env.PORT || 5000;
+import config from "./app/config/index.js";
+import { prisma } from "./app/lib/prisma.js";
 
 const main = async () => {
   try {
-    app.listen(PORT, () => {
-      console.log(`TaskFlow server is running on port ${PORT}`);
+    // Connect Prisma to PostgreSQL
+    await prisma.$connect();
+
+    // Run a simple query to confirm the database is reachable
+    await prisma.$queryRaw`SELECT 1`;
+
+    console.log("✅ PostgreSQL database connected successfully");
+
+    app.listen(config.port, () => {
+      console.log(`🚀 TaskFlow server is running on port ${config.port}`);
     });
   } catch (error) {
-    console.error("Failed to start server:", error);
+    console.error("❌ Failed to connect to PostgreSQL database:", error);
+
     process.exit(1);
   }
 };

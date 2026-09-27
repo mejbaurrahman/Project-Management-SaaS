@@ -10,7 +10,7 @@ model Team {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-projects Project[]
+  projects Project[]
   members TeamMember[]
 
   @@index([organizationId])

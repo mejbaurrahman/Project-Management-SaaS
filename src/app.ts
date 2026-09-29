@@ -12,6 +12,7 @@ import helmet from "helmet";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler.js";
 import { notFound } from "./app/middleware/notFound.js";
 import { AuthRoutes } from "./app/modules/auth/auth.route.js";
+import { UserRoutes } from "./app/modules/user/user.route.js";
 
 const app: Application = express();
 
@@ -47,6 +48,7 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 
 app.use("/api/v1/auth", AuthRoutes);
+app.use("/api/v1/users", UserRoutes);
 // health check
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({

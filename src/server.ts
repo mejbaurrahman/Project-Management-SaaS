@@ -1,12 +1,14 @@
 import app from "./app.js";
 import config from "./app/config/index.js";
 import { prisma } from "./app/lib/prisma.js";
+import { seedTesterAdmin } from "./app/utils/seed.js";
 
 const main = async () => {
   try {
     // Connect Prisma to PostgreSQL
     await prisma.$connect();
 
+    await seedTesterAdmin();
     // Run a simple query to confirm the database is reachable
     await prisma.$queryRaw`SELECT 1`;
 

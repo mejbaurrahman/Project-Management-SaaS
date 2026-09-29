@@ -27,6 +27,9 @@ const config = {
   bcrypt_salt_rounds: Number(process.env.BCRYPT_SALT_ROUNDS ?? 10),
 
   google_client_id: process.env.GOOGLE_CLIENT_ID ?? "",
+  tester_admin_name: process.env.TESTER_ADMIN_NAME!,
+  tester_admin_email: process.env.TESTER_ADMIN_EMAIL!,
+  tester_admin_password: process.env.TESTER_ADMIN_PASSWORD!,
 };
 
 export default config;

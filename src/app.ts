@@ -13,6 +13,9 @@ import { globalErrorHandler } from "./app/middleware/globalErrorHandler.js";
 import { notFound } from "./app/middleware/notFound.js";
 import { AuthRoutes } from "./app/modules/auth/auth.route.js";
 import { UserRoutes } from "./app/modules/user/user.route.js";
+import { OrganizationRoutes } from "./app/modules/organization/organization.route.js";
+import { TeamRoutes } from "./app/modules/team/team.route.js";
+import { ProjectRoutes } from "./app/modules/project/project.route.js";
 
 const app: Application = express();
 
@@ -49,6 +52,9 @@ app.use("/api", limiter);
 
 app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/users", UserRoutes);
+app.use("/api/v1/organizations", OrganizationRoutes);
+app.use("/api/v1/teams", TeamRoutes);
+app.use("/api/v1/projects", ProjectRoutes);
 // health check
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({

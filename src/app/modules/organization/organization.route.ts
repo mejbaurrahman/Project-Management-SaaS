@@ -38,21 +38,21 @@ router.patch(
 // Soft delete organization
 router.delete(
   "/:id",
-  checkAuth(),
+  checkAuth(UserRole.MEMBER),
   OrganizationController.softDeleteOrganization,
 );
 
 // Get organization members
 router.get(
   "/:id/members",
-  checkAuth(),
+  checkAuth(UserRole.MEMBER),
   OrganizationController.getOrganizationMembers,
 );
 
 // Add member
 router.post(
   "/:id/members",
-  checkAuth(),
+  checkAuth(UserRole.MEMBER),
   validateRequest(OrganizationValidation.addOrganizationMemberValidationSchema),
   OrganizationController.addOrganizationMember,
 );
@@ -60,7 +60,7 @@ router.post(
 // Update organization member role
 router.patch(
   "/:id/members/:userId/role",
-  checkAuth(),
+  checkAuth(UserRole.MEMBER),
   validateRequest(
     OrganizationValidation.updateOrganizationMemberRoleValidationSchema,
   ),
@@ -70,7 +70,7 @@ router.patch(
 // Remove member
 router.delete(
   "/:id/members/:userId",
-  checkAuth(),
+  checkAuth(UserRole.MEMBER),
   OrganizationController.removeOrganizationMember,
 );
 

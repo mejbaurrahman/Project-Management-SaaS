@@ -16,6 +16,8 @@ import { UserRoutes } from "./app/modules/user/user.route.js";
 import { OrganizationRoutes } from "./app/modules/organization/organization.route.js";
 import { TeamRoutes } from "./app/modules/team/team.route.js";
 import { ProjectRoutes } from "./app/modules/project/project.route.js";
+import { SprintRoutes } from "./app/modules/sprint/sprint.route.js";
+import { TaskRoutes } from "./app/modules/task/task.route.js";
 
 const app: Application = express();
 
@@ -55,6 +57,8 @@ app.use("/api/v1/users", UserRoutes);
 app.use("/api/v1/organizations", OrganizationRoutes);
 app.use("/api/v1/teams", TeamRoutes);
 app.use("/api/v1/projects", ProjectRoutes);
+app.use("/api/v1/sprints", SprintRoutes);
+app.use("/api/v1/tasks", TaskRoutes);
 // health check
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({

@@ -18,6 +18,7 @@ import { TeamRoutes } from "./app/modules/team/team.route.js";
 import { ProjectRoutes } from "./app/modules/project/project.route.js";
 import { SprintRoutes } from "./app/modules/sprint/sprint.route.js";
 import { TaskRoutes } from "./app/modules/task/task.route.js";
+import { CommentRoutes } from "./app/modules/comment/comment.route.js";
 
 const app: Application = express();
 
@@ -59,6 +60,7 @@ app.use("/api/v1/teams", TeamRoutes);
 app.use("/api/v1/projects", ProjectRoutes);
 app.use("/api/v1/sprints", SprintRoutes);
 app.use("/api/v1/tasks", TaskRoutes);
+app.use("/api/v1/comments", CommentRoutes);
 // health check
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({

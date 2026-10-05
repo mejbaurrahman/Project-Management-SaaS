@@ -16,7 +16,7 @@ const main = async () => {
     console.log("NODE ENV:", config.node_env);
 
     app.listen(config.port, () => {
-      console.log(`TaskFlow server is running on port ${config.port}`);
+      console.log(`PMS server is running on port ${config.port}`);
     });
   } catch (error) {
     console.error("Failed to connect to PostgreSQL database:", error);

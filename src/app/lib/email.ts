@@ -21,17 +21,17 @@ const sendOtpEmail = async (
   const purposeText = purpose === "REGISTER" ? "registration" : "login";
 
   await transporter.sendMail({
-    from: `"TaskFlow" <${config.email_sender}>`,
+    from: `"PMS" <${config.email_sender}>`,
 
     to: email,
 
-    subject: `TaskFlow ${purposeText} OTP`,
+    subject: `PMS ${purposeText} OTP`,
 
-    text: `Your TaskFlow OTP is ${otp}. This code will expire in 5 minutes.`,
+    text: `Your PMS OTP is ${otp}. This code will expire in 5 minutes.`,
 
     html: `
       <div style="font-family: Arial, sans-serif;">
-        <h2>TaskFlow</h2>
+        <h2>PMS</h2>
 
         <p>
           Your ${purposeText} verification code is:

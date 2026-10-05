@@ -71,7 +71,7 @@ app.use("/api/v1/payments", PaymentRoutes);
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({
     success: true,
-    message: "TaskFlow API is running",
+    message: "PMS API is running",
     data: {
       status: "OK",
     },
@@ -81,7 +81,7 @@ app.get("/health", (_req: Request, res: Response) => {
 app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({
     success: true,
-    message: "Welcome to TaskFlow Project Management SaaS API",
+    message: "Welcome to PMS Project Management SaaS API",
     data: null,
   });
 });

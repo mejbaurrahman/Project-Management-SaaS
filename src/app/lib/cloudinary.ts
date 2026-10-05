@@ -8,7 +8,7 @@ cloudinary.config({
   api_secret: config.cloudinary_api_secret,
 });
 
-const uploadBuffer = (buffer: Buffer, folder = "taskflow/attachments") => {
+const uploadBuffer = (buffer: Buffer, folder = "PMS/attachments") => {
   return new Promise<{
     secure_url: string;
     public_id: string;

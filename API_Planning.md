@@ -1,24 +1,24 @@
-# TaskFlow Project Management SaaS — API Planning
+# Project Management SaaS — API Planning
 
 ## 1. Assignment Roadmap
 
-| Phase | Scope | Status |
-|---|---|---|
-| 1. Planning & Database | Requirements, Prisma schema, migration, API planning | **In progress → API plan added here** |
-| 2. Auth & Core APIs | JWT/Bearer auth, RBAC, users, foundational CRUD | **Started** |
-| 3. Business Logic & Validation | 20+ APIs, Zod, errors, pagination, transactions | Planned |
-| 4. Payment & Testing | bKash, callbacks, tests, Postman docs | Planned |
-| 5. Deployment & Submission | Deployment, QA, README, video | Planned |
+| Phase                          | Scope                                                | Status                                |
+| ------------------------------ | ---------------------------------------------------- | ------------------------------------- |
+| 1. Planning & Database         | Requirements, Prisma schema, migration, API planning | **In progress → API plan added here** |
+| 2. Auth & Core APIs            | JWT/Bearer auth, RBAC, users, foundational CRUD      | **Started**                           |
+| 3. Business Logic & Validation | 20+ APIs, Zod, errors, pagination, transactions      | Planned                               |
+| 4. Payment & Testing           | bKash, callbacks, tests, Postman docs                | Planned                               |
+| 5. Deployment & Submission     | Deployment, QA, README, video                        | Planned                               |
 
 ## 2. Primary Roles
 
 The assignment requires exactly three primary application roles.
 
-| Role | Main permissions |
-|---|---|
-| `ADMIN` | Platform user management, platform analytics, audit visibility, block/unblock users |
+| Role      | Main permissions                                                                         |
+| --------- | ---------------------------------------------------------------------------------------- |
+| `ADMIN`   | Platform user management, platform analytics, audit visibility, block/unblock users      |
 | `MANAGER` | Create/manage organizations, teams, projects, sprints and tasks where membership permits |
-| `MEMBER` | View accessible projects/tasks, update permitted task workflow, comments/attachments |
+| `MEMBER`  | View accessible projects/tasks, update permitted task workflow, comments/attachments     |
 
 `OrganizationRole` (`OWNER`, `MANAGER`, `MEMBER`, `GUEST`) is tenant-scoped membership authorization and does not replace the three primary application roles.
 
@@ -60,127 +60,127 @@ Legend: ✅ implemented in current progress package, ⏳ next/upcoming.
 
 ### Authentication
 
-| Status | Method | Endpoint | Access | Purpose |
-|---|---|---|---|---|
-| ✅ | POST | `/api/v1/auth/register` | Public | Register member with email/password |
-| ✅ | POST | `/api/v1/auth/login` | Public | Login and issue tokens |
-| ✅ | POST | `/api/v1/auth/google` | Public | Google/GCP social login using ID token |
-| ✅ | POST | `/api/v1/auth/refresh-token` | Public/token | Rotate access/refresh token pair |
-| ✅ | POST | `/api/v1/auth/logout` | Authenticated | Clear auth cookies |
-| ✅ | GET | `/api/v1/auth/me` | Authenticated | Current authenticated user |
+| Status | Method | Endpoint                     | Access        | Purpose                                |
+| ------ | ------ | ---------------------------- | ------------- | -------------------------------------- |
+| ✅     | POST   | `/api/v1/auth/register`      | Public        | Register member with email/password    |
+| ✅     | POST   | `/api/v1/auth/login`         | Public        | Login and issue tokens                 |
+| ✅     | POST   | `/api/v1/auth/google`        | Public        | Google/GCP social login using ID token |
+| ✅     | POST   | `/api/v1/auth/refresh-token` | Public/token  | Rotate access/refresh token pair       |
+| ✅     | POST   | `/api/v1/auth/logout`        | Authenticated | Clear auth cookies                     |
+| ✅     | GET    | `/api/v1/auth/me`            | Authenticated | Current authenticated user             |
 
 ### Users / Admin
 
-| Status | Method | Endpoint | Access |
-|---|---|---|---|
-| ✅ | PATCH | `/api/v1/users/me` | Any authenticated user |
-| ✅ | GET | `/api/v1/users` | ADMIN |
-| ✅ | GET | `/api/v1/users/:id` | ADMIN |
-| ✅ | PATCH | `/api/v1/users/:id/role` | ADMIN |
-| ✅ | PATCH | `/api/v1/users/:id/status` | ADMIN |
-| ✅ | DELETE | `/api/v1/users/:id` | ADMIN; soft delete |
+| Status | Method | Endpoint                   | Access                 |
+| ------ | ------ | -------------------------- | ---------------------- |
+| ✅     | PATCH  | `/api/v1/users/me`         | Any authenticated user |
+| ✅     | GET    | `/api/v1/users`            | ADMIN                  |
+| ✅     | GET    | `/api/v1/users/:id`        | ADMIN                  |
+| ✅     | PATCH  | `/api/v1/users/:id/role`   | ADMIN                  |
+| ✅     | PATCH  | `/api/v1/users/:id/status` | ADMIN                  |
+| ✅     | DELETE | `/api/v1/users/:id`        | ADMIN; soft delete     |
 
 ### Organizations
 
-| Status | Method | Endpoint | Access |
-|---|---|---|---|
-| ⏳ | POST | `/api/v1/organizations` | MANAGER/ADMIN |
-| ⏳ | GET | `/api/v1/organizations` | Authenticated; own memberships |
-| ⏳ | GET | `/api/v1/organizations/:id` | Organization member |
-| ⏳ | PATCH | `/api/v1/organizations/:id` | OWNER / organization MANAGER |
-| ⏳ | DELETE | `/api/v1/organizations/:id` | OWNER/ADMIN; soft delete |
-| ⏳ | GET | `/api/v1/organizations/:id/members` | Organization member |
-| ⏳ | POST | `/api/v1/organizations/:id/members` | OWNER / organization MANAGER |
-| ⏳ | PATCH | `/api/v1/organizations/:id/members/:userId/role` | OWNER |
-| ⏳ | DELETE | `/api/v1/organizations/:id/members/:userId` | OWNER / organization MANAGER |
+| Status | Method | Endpoint                                         | Access                         |
+| ------ | ------ | ------------------------------------------------ | ------------------------------ |
+| ⏳     | POST   | `/api/v1/organizations`                          | MANAGER/ADMIN                  |
+| ⏳     | GET    | `/api/v1/organizations`                          | Authenticated; own memberships |
+| ⏳     | GET    | `/api/v1/organizations/:id`                      | Organization member            |
+| ⏳     | PATCH  | `/api/v1/organizations/:id`                      | OWNER / organization MANAGER   |
+| ⏳     | DELETE | `/api/v1/organizations/:id`                      | OWNER/ADMIN; soft delete       |
+| ⏳     | GET    | `/api/v1/organizations/:id/members`              | Organization member            |
+| ⏳     | POST   | `/api/v1/organizations/:id/members`              | OWNER / organization MANAGER   |
+| ⏳     | PATCH  | `/api/v1/organizations/:id/members/:userId/role` | OWNER                          |
+| ⏳     | DELETE | `/api/v1/organizations/:id/members/:userId`      | OWNER / organization MANAGER   |
 
 ### Teams
 
-| Status | Method | Endpoint | Access |
-|---|---|---|---|
-| ⏳ | POST | `/api/v1/teams` | Organization OWNER/MANAGER |
-| ⏳ | GET | `/api/v1/teams` | Organization member |
-| ⏳ | GET | `/api/v1/teams/:id` | Organization member |
-| ⏳ | PATCH | `/api/v1/teams/:id` | Organization OWNER/MANAGER |
-| ⏳ | DELETE | `/api/v1/teams/:id` | Organization OWNER/MANAGER; soft delete |
-| ⏳ | POST | `/api/v1/teams/:id/members` | Organization OWNER/MANAGER |
-| ⏳ | DELETE | `/api/v1/teams/:id/members/:userId` | Organization OWNER/MANAGER |
+| Status | Method | Endpoint                            | Access                                  |
+| ------ | ------ | ----------------------------------- | --------------------------------------- |
+| ⏳     | POST   | `/api/v1/teams`                     | Organization OWNER/MANAGER              |
+| ⏳     | GET    | `/api/v1/teams`                     | Organization member                     |
+| ⏳     | GET    | `/api/v1/teams/:id`                 | Organization member                     |
+| ⏳     | PATCH  | `/api/v1/teams/:id`                 | Organization OWNER/MANAGER              |
+| ⏳     | DELETE | `/api/v1/teams/:id`                 | Organization OWNER/MANAGER; soft delete |
+| ⏳     | POST   | `/api/v1/teams/:id/members`         | Organization OWNER/MANAGER              |
+| ⏳     | DELETE | `/api/v1/teams/:id/members/:userId` | Organization OWNER/MANAGER              |
 
 ### Projects
 
-| Status | Method | Endpoint | Access |
-|---|---|---|---|
-| ⏳ | POST | `/api/v1/projects` | MANAGER + organization access |
-| ⏳ | GET | `/api/v1/projects` | Accessible projects; paginated/filterable/searchable |
-| ⏳ | GET | `/api/v1/projects/:id` | Project organization member |
-| ⏳ | PATCH | `/api/v1/projects/:id` | MANAGER + organization access |
-| ⏳ | PATCH | `/api/v1/projects/:id/status` | MANAGER + organization access |
-| ⏳ | DELETE | `/api/v1/projects/:id` | MANAGER + organization access; soft delete |
+| Status | Method | Endpoint                      | Access                                               |
+| ------ | ------ | ----------------------------- | ---------------------------------------------------- |
+| ⏳     | POST   | `/api/v1/projects`            | MANAGER + organization access                        |
+| ⏳     | GET    | `/api/v1/projects`            | Accessible projects; paginated/filterable/searchable |
+| ⏳     | GET    | `/api/v1/projects/:id`        | Project organization member                          |
+| ⏳     | PATCH  | `/api/v1/projects/:id`        | MANAGER + organization access                        |
+| ⏳     | PATCH  | `/api/v1/projects/:id/status` | MANAGER + organization access                        |
+| ⏳     | DELETE | `/api/v1/projects/:id`        | MANAGER + organization access; soft delete           |
 
 Planned list query example:
 
-`GET /api/v1/projects?page=1&limit=10&status=ACTIVE&search=taskflow&sortBy=createdAt&sortOrder=desc`
+`GET /api/v1/projects?page=1&limit=10&status=ACTIVE&search=PMS&sortBy=createdAt&sortOrder=desc`
 
 ### Sprints
 
-| Status | Method | Endpoint |
-|---|---|---|
-| ⏳ | POST | `/api/v1/sprints` |
-| ⏳ | GET | `/api/v1/sprints` |
-| ⏳ | GET | `/api/v1/sprints/:id` |
-| ⏳ | PATCH | `/api/v1/sprints/:id` |
-| ⏳ | PATCH | `/api/v1/sprints/:id/status` |
+| Status | Method | Endpoint                     |
+| ------ | ------ | ---------------------------- |
+| ⏳     | POST   | `/api/v1/sprints`            |
+| ⏳     | GET    | `/api/v1/sprints`            |
+| ⏳     | GET    | `/api/v1/sprints/:id`        |
+| ⏳     | PATCH  | `/api/v1/sprints/:id`        |
+| ⏳     | PATCH  | `/api/v1/sprints/:id/status` |
 
 ### Tasks and Subtasks
 
-| Status | Method | Endpoint |
-|---|---|---|
-| ⏳ | POST | `/api/v1/tasks` |
-| ⏳ | GET | `/api/v1/tasks` |
-| ⏳ | GET | `/api/v1/tasks/my-tasks` |
-| ⏳ | GET | `/api/v1/tasks/:id` |
-| ⏳ | PATCH | `/api/v1/tasks/:id` |
-| ⏳ | DELETE | `/api/v1/tasks/:id` |
-| ⏳ | PATCH | `/api/v1/tasks/:id/status` |
-| ⏳ | POST | `/api/v1/tasks/:id/assign` |
-| ⏳ | POST | `/api/v1/tasks/:id/subtasks` |
+| Status | Method | Endpoint                     |
+| ------ | ------ | ---------------------------- |
+| ⏳     | POST   | `/api/v1/tasks`              |
+| ⏳     | GET    | `/api/v1/tasks`              |
+| ⏳     | GET    | `/api/v1/tasks/my-tasks`     |
+| ⏳     | GET    | `/api/v1/tasks/:id`          |
+| ⏳     | PATCH  | `/api/v1/tasks/:id`          |
+| ⏳     | DELETE | `/api/v1/tasks/:id`          |
+| ⏳     | PATCH  | `/api/v1/tasks/:id/status`   |
+| ⏳     | POST   | `/api/v1/tasks/:id/assign`   |
+| ⏳     | POST   | `/api/v1/tasks/:id/subtasks` |
 
 Task list will support pagination, filtering by status/priority/project/sprint/assignee, sorting and text search.
 
 ### Comments
 
-| Status | Method | Endpoint |
-|---|---|---|
-| ⏳ | POST | `/api/v1/tasks/:taskId/comments` |
-| ⏳ | GET | `/api/v1/tasks/:taskId/comments` |
-| ⏳ | PATCH | `/api/v1/comments/:id` |
-| ⏳ | DELETE | `/api/v1/comments/:id` |
+| Status | Method | Endpoint                         |
+| ------ | ------ | -------------------------------- |
+| ⏳     | POST   | `/api/v1/tasks/:taskId/comments` |
+| ⏳     | GET    | `/api/v1/tasks/:taskId/comments` |
+| ⏳     | PATCH  | `/api/v1/comments/:id`           |
+| ⏳     | DELETE | `/api/v1/comments/:id`           |
 
 ### Attachments
 
-| Status | Method | Endpoint |
-|---|---|---|
-| ⏳ | POST | `/api/v1/tasks/:taskId/attachments` |
-| ⏳ | GET | `/api/v1/tasks/:taskId/attachments` |
-| ⏳ | DELETE | `/api/v1/attachments/:id` |
+| Status | Method | Endpoint                            |
+| ------ | ------ | ----------------------------------- |
+| ⏳     | POST   | `/api/v1/tasks/:taskId/attachments` |
+| ⏳     | GET    | `/api/v1/tasks/:taskId/attachments` |
+| ⏳     | DELETE | `/api/v1/attachments/:id`           |
 
 ### Payments — bKash
 
-| Status | Method | Endpoint |
-|---|---|---|
-| ⏳ | POST | `/api/v1/payments/initiate` |
-| ⏳ | GET/POST | `/api/v1/payments/callback` |
-| ⏳ | GET | `/api/v1/payments/:id` |
-| ⏳ | GET | `/api/v1/payments` |
+| Status | Method   | Endpoint                    |
+| ------ | -------- | --------------------------- |
+| ⏳     | POST     | `/api/v1/payments/initiate` |
+| ⏳     | GET/POST | `/api/v1/payments/callback` |
+| ⏳     | GET      | `/api/v1/payments/:id`      |
+| ⏳     | GET      | `/api/v1/payments`          |
 
 No fake/manual payment success status will be used. Gateway verification must determine payment status.
 
 ### Activity / Analytics
 
-| Status | Method | Endpoint |
-|---|---|---|
-| ⏳ | GET | `/api/v1/activity-logs` |
-| ⏳ | GET | `/api/v1/analytics/dashboard` |
+| Status | Method | Endpoint                      |
+| ------ | ------ | ----------------------------- |
+| ⏳     | GET    | `/api/v1/activity-logs`       |
+| ⏳     | GET    | `/api/v1/analytics/dashboard` |
 
 ## 6. Validation Plan
 

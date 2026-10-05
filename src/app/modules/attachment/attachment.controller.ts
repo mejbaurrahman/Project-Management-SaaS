@@ -27,7 +27,7 @@ const createAttachments = catchAsync(async (req: Request, res: Response) => {
   for (const file of files) {
     const cloudinaryResult = await CloudinaryUtils.uploadBuffer(
       file.buffer,
-      "taskflow/attachments",
+      "PMS/attachments",
     );
 
     const attachment = await AttachmentService.createAttachment(

@@ -9,7 +9,6 @@ import { UserRole } from "../../../generated/prisma/enums.js";
 
 const router = Router();
 
-// Create organization
 router.post(
   "/",
   checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
@@ -17,21 +16,18 @@ router.post(
   OrganizationController.createOrganization,
 );
 
-// Get organizations where current user is a member
 router.get(
   "/",
   checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   OrganizationController.getMyOrganizations,
 );
 
-// Get one organization
 router.get(
   "/:id",
   checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   OrganizationController.getOrganizationById,
 );
 
-// Update organization
 router.patch(
   "/:id",
   checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
@@ -39,21 +35,18 @@ router.patch(
   OrganizationController.updateOrganization,
 );
 
-// Soft delete organization
 router.delete(
   "/:id",
   checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   OrganizationController.softDeleteOrganization,
 );
 
-// Get organization members
 router.get(
   "/:id/members",
   checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   OrganizationController.getOrganizationMembers,
 );
 
-// Add member
 router.post(
   "/:id/members",
   checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),

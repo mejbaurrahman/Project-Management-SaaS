@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs";
 import httpStatus from "http-status";
 import { UserRole } from "../../generated/prisma/enums";
 import config from "../config";
-import { prisma } from "../lib/prisma";
-import { AppError } from "./AppError";
+import { prisma } from "../lib/prisma.js";
+import { AppError } from "./AppError.js";
 
 //create tester admin
 

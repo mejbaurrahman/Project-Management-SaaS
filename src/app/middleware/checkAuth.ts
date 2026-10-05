@@ -3,10 +3,10 @@ import type { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import type { UserRole } from "../../generated/prisma/enums";
 
-import { prisma } from "../lib/prisma";
-import { AppError } from "../utils/AppError";
-import { catchAsync } from "../utils/catchAsync";
-import { JwtUtils } from "../utils/jwt";
+import { prisma } from "../lib/prisma.js";
+import { AppError } from "../utils/AppError.js";
+import { catchAsync } from "../utils/catchAsync.js";
+import { JwtUtils } from "../utils/jwt.js";
 
 export interface RequestUser {
   email: string;

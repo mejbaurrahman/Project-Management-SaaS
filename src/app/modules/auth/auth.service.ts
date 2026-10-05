@@ -2,13 +2,13 @@ import bcrypt from "bcryptjs";
 import httpStatus from "http-status";
 
 import config from "../../config";
-import { EmailUtils } from "../../lib/email";
-import { prisma } from "../../lib/prisma";
-import { redisClient } from "../../lib/redis";
+import { EmailUtils } from "../../lib/email.js";
+import { prisma } from "../../lib/prisma.js";
+import { redisClient } from "../../lib/redis.js";
 
-import { AppError } from "../../utils/AppError";
-import { JwtUtils } from "../../utils/jwt";
-import { OtpUtils } from "../../utils/otp";
+import { AppError } from "../../utils/AppError.js";
+import { JwtUtils } from "../../utils/jwt.js";
+import { OtpUtils } from "../../utils/otp.js";
 
 import type {
   TLoginPayload,

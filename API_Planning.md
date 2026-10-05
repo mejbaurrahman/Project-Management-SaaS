@@ -60,14 +60,15 @@ Legend: ✅ implemented in current progress package, ⏳ next/upcoming.
 
 ### Authentication
 
-| Status | Method | Endpoint                     | Access        | Purpose                                |
-| ------ | ------ | ---------------------------- | ------------- | -------------------------------------- |
-| ✅     | POST   | `/api/v1/auth/register`      | Public        | Register member with email/password    |
-| ✅     | POST   | `/api/v1/auth/login`         | Public        | Login and issue tokens                 |
-| ✅     | POST   | `/api/v1/auth/google`        | Public        | Google/GCP social login using ID token |
-| ✅     | POST   | `/api/v1/auth/refresh-token` | Public/token  | Rotate access/refresh token pair       |
-| ✅     | POST   | `/api/v1/auth/logout`        | Authenticated | Clear auth cookies                     |
-| ✅     | GET    | `/api/v1/auth/me`            | Authenticated | Current authenticated user             |
+| Status | Method | Endpoint                           | Access        | Purpose                                |
+| ------ | ------ | ---------------------------------- | ------------- | -------------------------------------- |
+| ✅     | POST   | `/api/v1/auth/register`            | Public        | Register member with email/password    |
+| ✅     | POST   | `/api/v1/auth/register/verify-otp` | Public        | Register member with email/otp         |
+| ✅     | POST   | `/api/v1/auth/login`               | Public        | Login and issue tokens                 |
+| ✅     | POST   | `/api/v1/auth/google`              | Public        | Google/GCP social login using ID token |
+| ✅     | POST   | `/api/v1/auth/refresh-token`       | Public/token  | Rotate access/refresh token pair       |
+| ✅     | POST   | `/api/v1/auth/logout`              | Authenticated | Clear auth cookies                     |
+| ✅     | GET    | `/api/v1/auth/me`                  | Authenticated | Current authenticated user             |
 
 ### Users / Admin
 

@@ -4,6 +4,7 @@ import { checkAuth } from "../../middleware/checkAuth.js";
 import { upload } from "../../middleware/upload.js";
 
 import { AttachmentController } from "./attachment.controller.js";
+import { UserRole } from "../../../generated/prisma/enums.js";
 
 const router = Router();
 

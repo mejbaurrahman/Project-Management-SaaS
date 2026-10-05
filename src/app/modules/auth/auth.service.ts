@@ -158,7 +158,7 @@ const verifyRegisterOtp = async (payload: TVerifyOtpPayload) => {
 };
 
 const loginUser = async (payload: TLoginPayload) => {
-  const email = payload.email.trim().toLowerCase();
+  const email = payload.email.toLowerCase().trim();
 
   const user = await prisma.user.findUnique({
     where: {
@@ -166,53 +166,50 @@ const loginUser = async (payload: TLoginPayload) => {
     },
   });
 
-  if (!user) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid email or password");
-  }
-
-  if (user.deletedAt) {
-    throw new AppError(httpStatus.FORBIDDEN, "User account is deleted");
+  if (!user || user.deletedAt) {
+    throw new AppError(401, "Invalid email or password");
   }
 
   if (user.status === "BLOCKED") {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      "Your account has been blocked. Please contact support.",
-    );
+    throw new AppError(403, "Your account is blocked");
   }
 
   if (!user.password) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Please login using Google");
+    throw new AppError(401, "Please login using Google");
   }
 
-  const passwordMatched = await bcrypt.compare(payload.password, user.password);
+  const isPasswordMatched = await bcrypt.compare(
+    payload.password,
+    user.password,
+  );
 
-  if (!passwordMatched) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid email or password");
+  if (!isPasswordMatched) {
+    throw new AppError(401, "Invalid email or password");
   }
 
-  const otp = OtpUtils.generateOtp();
+  const jwtPayload = {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+  };
 
-  const otpKey = `login:otp:${email}`;
+  const accessToken = JwtUtils.createAccessToken(jwtPayload);
 
-  await redisClient.set(otpKey, otp, {
-    EX: config.otp_expires_in,
-  });
-
-  try {
-    await EmailUtils.sendOtpEmail(email, otp, "LOGIN");
-  } catch {
-    await redisClient.del(otpKey);
-
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to send login OTP",
-    );
-  }
+  const refreshToken = JwtUtils.createRefreshToken(jwtPayload);
 
   return {
-    email,
-    expiresIn: config.otp_expires_in,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      profilePhoto: user.profilePhoto,
+      role: user.role,
+      status: user.status,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
+    accessToken,
+    refreshToken,
   };
 };
 

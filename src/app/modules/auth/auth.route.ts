@@ -28,12 +28,6 @@ router.post(
 );
 
 router.post(
-  "/login/verify-otp",
-  validateRequest(AuthValidation.verifyOtpValidationSchema),
-  AuthController.verifyLoginOtp,
-);
-
-router.post(
   "/refresh-token",
   validateRequest(AuthValidation.refreshTokenValidationSchema),
   AuthController.refreshToken,

@@ -66,14 +66,33 @@ const verifyRegisterOtp = catchAsync(async (req: Request, res: Response) => {
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthService.loginUser(req.body);
 
+  const { accessToken, refreshToken, user } = result;
+
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+  });
+
   sendResponse(res, {
     success: true,
-    statusCode: httpStatus.OK,
-    message: "Login OTP sent successfully",
-    data: result,
+    statusCode: 200,
+    message: "Login successful",
+    data: {
+      user,
+      accessToken,
+      refreshToken,
+    },
   });
 });
-
 // ========================================
 // VERIFY LOGIN OTP
 // Generate tokens + set cookies

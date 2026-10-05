@@ -28,10 +28,6 @@ const publicUserSelect = {
   updatedAt: true,
 };
 
-// ========================================
-// REGISTER
-// ========================================
-
 const registerUser = async (payload: TRegisterPayload) => {
   const email = payload.email.trim().toLowerCase();
 
@@ -89,10 +85,6 @@ const registerUser = async (payload: TRegisterPayload) => {
     expiresIn: config.otp_expires_in,
   };
 };
-
-// ========================================
-// VERIFY REGISTER OTP
-// ========================================
 
 const verifyRegisterOtp = async (payload: TVerifyOtpPayload) => {
   const email = payload.email.trim().toLowerCase();
@@ -165,10 +157,6 @@ const verifyRegisterOtp = async (payload: TVerifyOtpPayload) => {
   };
 };
 
-// ========================================
-// LOGIN
-// ========================================
-
 const loginUser = async (payload: TLoginPayload) => {
   const email = payload.email.trim().toLowerCase();
 
@@ -227,10 +215,6 @@ const loginUser = async (payload: TLoginPayload) => {
     expiresIn: config.otp_expires_in,
   };
 };
-
-// ========================================
-// VERIFY LOGIN OTP
-// ========================================
 
 const verifyLoginOtp = async (payload: TVerifyOtpPayload) => {
   const email = payload.email.trim().toLowerCase();

@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import httpStatus from "http-status";
 
-import config from "../../config";
+import config from "../../config/index.js";
 import { EmailUtils } from "../../lib/email.js";
 import { prisma } from "../../lib/prisma.js";
 import { redisClient } from "../../lib/redis.js";

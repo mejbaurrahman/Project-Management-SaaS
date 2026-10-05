@@ -126,17 +126,6 @@
             }
           },
           "response": []
-        },
-        {
-          "name": "login-otp-verify",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": ""
-            }
-          },
-          "response": []
         }
       ]
     },

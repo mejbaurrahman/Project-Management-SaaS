@@ -4,30 +4,33 @@ PMS is a backend-only Project Management SaaS built with Node.js, TypeScript, Ex
 
 ## Live Link
 
-- Backend: https://your-pms-backend.vercel.app
-- GitHub: https://github.com/your-username/pms-backend
+- **Live API:** https://assignment-6-six-xi.vercel.app/
+- **GitHub Repository:** https://github.com/mejbaurrahman/Project-Management-SaaS
 
-> Replace the placeholder links with your actual deployed backend and GitHub repository.
+## Admin Demo Credentials
+
+- **Email:** testeradmin@gmail.com
+- **Password:** Tester@admin12345
 
 ## Features
 
-- Register and login with Email OTP
-- Redis OTP verification
+- User registration with Email OTP verification
+- Login with email and password
 - JWT access and refresh tokens
 - Role-based authorization
-- Organizations and members
-- Teams and team members
-- Projects and project status
-- Sprints
-- Tasks and subtasks
+- Organization and member management
+- Team and team-member management
+- Project management
+- Sprint management
+- Task and subtask management
 - Comments
-- Multiple file upload with Cloudinary
+- Multiple file uploads with Cloudinary
 - Activity logs
 - bKash payment integration
 - Pagination, filtering, search and sorting
 - Soft delete
-- Global error handling
 - Zod validation
+- Global error handling
 
 ## Tech Stack
 
@@ -61,57 +64,16 @@ Build:
 npm run build
 ```
 
-Default server:
-
-```text
-http://localhost:5000
-```
-
-Base API:
+Local API:
 
 ```text
 http://localhost:5000/api/v1
 ```
 
-## Environment Variables
+Live API:
 
-Create a `.env` file:
-
-```env
-NODE_ENV=development
-PORT=5000
-
-DATABASE_URL=YOUR_DATABASE_URL
-
-JWT_ACCESS_SECRET=YOUR_SECRET
-JWT_REFRESH_SECRET=YOUR_SECRET
-JWT_ACCESS_EXPIRES_IN=1d
-JWT_REFRESH_EXPIRES_IN=7d
-
-BCRYPT_SALT_ROUNDS=10
-
-REDIS_USER=default
-REDIS_PASSWORD=YOUR_REDIS_PASSWORD
-REDIS_HOST=YOUR_REDIS_HOST
-REDIS_PORT=YOUR_REDIS_PORT
-OTP_EXPIRES_IN=300
-
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=YOUR_EMAIL
-SMTP_PASSWORD=YOUR_GMAIL_APP_PASSWORD
-EMAIL_SENDER=YOUR_EMAIL
-
-CLOUDINARY_CLOUD_NAME=YOUR_CLOUD_NAME
-CLOUDINARY_API_KEY=YOUR_API_KEY
-CLOUDINARY_API_SECRET=YOUR_API_SECRET
-
-BKASH_BASE_URL=YOUR_BKASH_URL
-BKASH_USERNAME=YOUR_BKASH_USERNAME
-BKASH_PASSWORD=YOUR_BKASH_PASSWORD
-BKASH_APP_KEY=YOUR_BKASH_APP_KEY
-BKASH_APP_SECRET=YOUR_BKASH_APP_SECRET
-BKASH_CALLBACK_URL=YOUR_CALLBACK_URL
+```text
+https://assignment-6-six-xi.vercel.app/api/v1
 ```
 
 ## Main API Modules
@@ -135,14 +97,12 @@ BKASH_CALLBACK_URL=YOUR_CALLBACK_URL
 ```text
 Register
 → Send OTP to email
-→ Verify OTP from Redis
+→ Verify OTP
 → Create user
 → Issue JWT
 
 Login
-→ Check password
-→ Send OTP
-→ Verify OTP
+→ Verify email and password
 → Issue JWT
 ```
 
@@ -156,20 +116,14 @@ files   File
 taskId  Text
 ```
 
-Files are uploaded to Cloudinary and the generated URL is saved in PostgreSQL.
+Files are uploaded to Cloudinary and the generated URL is stored in PostgreSQL.
 
 ## Deployment
 
-For Vercel, use:
+The backend is deployed on Vercel:
 
 ```text
-api/index.ts
+https://assignment-6-six-xi.vercel.app/
 ```
 
-```ts
-import app from "../src/app.js";
-
-export default app;
-```
-
-Then add all environment variables in Vercel Project Settings before deployment.
+Add all required environment variables in Vercel Project Settings before deployment.

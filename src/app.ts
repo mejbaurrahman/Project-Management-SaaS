@@ -67,16 +67,6 @@ app.use("/api/v1/comments", CommentRoutes);
 app.use("/api/v1/attachments", AttachmentRoutes);
 app.use("/api/v1/activity-logs", ActivityLogRoutes);
 app.use("/api/v1/payments", PaymentRoutes);
-// health check
-app.get("/health", (_req: Request, res: Response) => {
-  res.status(200).json({
-    success: true,
-    message: "PMS API is running",
-    data: {
-      status: "OK",
-    },
-  });
-});
 
 app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({

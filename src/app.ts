@@ -16,9 +16,12 @@ import { UserRoutes } from "./app/modules/user/user.route.js";
 import { OrganizationRoutes } from "./app/modules/organization/organization.route.js";
 import { TeamRoutes } from "./app/modules/team/team.route.js";
 import { ProjectRoutes } from "./app/modules/project/project.route.js";
+import { AttachmentRoutes } from "./app/modules/attachment/attachment.route.js";
 import { SprintRoutes } from "./app/modules/sprint/sprint.route.js";
 import { TaskRoutes } from "./app/modules/task/task.route.js";
 import { CommentRoutes } from "./app/modules/comment/comment.route.js";
+import { ActivityLogRoutes } from "./app/modules/activityLog/activityLog.route.js";
+import { PaymentRoutes } from "./app/modules/payment/payment.route.js";
 
 const app: Application = express();
 
@@ -61,6 +64,9 @@ app.use("/api/v1/projects", ProjectRoutes);
 app.use("/api/v1/sprints", SprintRoutes);
 app.use("/api/v1/tasks", TaskRoutes);
 app.use("/api/v1/comments", CommentRoutes);
+app.use("/api/v1/attachments", AttachmentRoutes);
+app.use("/api/v1/activity-logs", ActivityLogRoutes);
+app.use("/api/v1/payments", PaymentRoutes);
 // health check
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({

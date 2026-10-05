@@ -1,12 +1,12 @@
 import type { NextFunction, Request, Response } from "express";
+
 import httpStatus from "http-status";
-import type { JwtPayload } from "jsonwebtoken";
 import type { UserRole } from "../../generated/prisma/enums";
-import config from "../config";
+
 import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/AppError";
 import { catchAsync } from "../utils/catchAsync";
-import { jwtUtils } from "../utils/jwt";
+import { JwtUtils } from "../utils/jwt";
 
 export interface RequestUser {
   email: string;
@@ -23,68 +23,91 @@ declare global {
   }
 }
 
-// auth(Role.ADMIN, Role.USER, Role.Author)
-// auth() => ...requiredRoles => [Role.ADMIN, Role.USER, Role.AUTHOR]
+// checkAuth(UserRole.ADMIN)
+// checkAuth(UserRole.ADMIN, UserRole.MANAGER)
+// checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER)
 export const checkAuth = (...requiredRoles: UserRole[]) => {
-  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies.accessToken
-      ? req.cookies.accessToken
-      : req.headers.authorization?.startsWith("Bearer ")
-        ? req.headers.authorization?.split(" ")[1]
-        : req.headers.authorization;
+  return catchAsync(
+    async (req: Request, _res: Response, next: NextFunction) => {
+      const token = req.cookies?.accessToken
+        ? req.cookies.accessToken
+        : req.headers.authorization?.startsWith("Bearer ")
+          ? req.headers.authorization.split(" ")[1]
+          : req.headers.authorization;
 
-    if (!token) {
-      throw new AppError(
-        httpStatus.UNAUTHORIZED,
-        "You are not logged in. Please log in to access this resource.",
-      );
-    }
+      if (!token) {
+        throw new AppError(
+          httpStatus.UNAUTHORIZED,
+          "You are not logged in. Please log in to access this resource.",
+        );
+      }
 
-    const verifiedToken = jwtUtils.verifyToken(token, config.jwt_access_secret);
+      let verifiedToken;
 
-    if (!verifiedToken.success) {
-      throw new AppError(httpStatus.UNAUTHORIZED, verifiedToken.error);
-    }
+      try {
+        verifiedToken = JwtUtils.verifyAccessToken(token);
+      } catch {
+        throw new AppError(
+          httpStatus.UNAUTHORIZED,
+          "Invalid or expired access token.",
+        );
+      }
 
-    const { email, name, userId, role } = verifiedToken.data as JwtPayload;
+      const { email, userId, role } = verifiedToken;
 
-    if (requiredRoles.length && !requiredRoles.includes(role)) {
-      throw new AppError(
-        httpStatus.FORBIDDEN,
-        "Forbidden. You don't have permission to access this resource.",
-      );
-    }
+      if (!email || !userId || !role) {
+        throw new AppError(httpStatus.UNAUTHORIZED, "Invalid access token.");
+      }
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-        email,
-        name,
-        role,
-      },
-    });
+      if (requiredRoles.length && !requiredRoles.includes(role)) {
+        throw new AppError(
+          httpStatus.FORBIDDEN,
+          "Forbidden. You don't have permission to access this resource.",
+        );
+      }
 
-    if (!user) {
-      throw new AppError(
-        httpStatus.UNAUTHORIZED,
-        "User not found. Please log in again.",
-      );
-    }
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
 
-    if (user.status === "BLOCKED") {
-      throw new AppError(
-        httpStatus.FORBIDDEN,
-        "Your account has been blocked. Please contact support.",
-      );
-    }
+      if (!user) {
+        throw new AppError(
+          httpStatus.UNAUTHORIZED,
+          "User not found. Please log in again.",
+        );
+      }
 
-    req.user = {
-      email,
-      name,
-      userId,
-      role,
-    };
+      if (user.deletedAt) {
+        throw new AppError(
+          httpStatus.UNAUTHORIZED,
+          "User account is no longer available.",
+        );
+      }
 
-    next();
-  });
+      if (user.status === "BLOCKED") {
+        throw new AppError(
+          httpStatus.FORBIDDEN,
+          "Your account has been blocked. Please contact support.",
+        );
+      }
+
+      if (user.email !== email || user.role !== role) {
+        throw new AppError(
+          httpStatus.UNAUTHORIZED,
+          "User authentication information is no longer valid. Please log in again.",
+        );
+      }
+
+      req.user = {
+        email: user.email,
+        name: user.name,
+        userId: user.id,
+        role: user.role,
+      };
+
+      next();
+    },
+  );
 };

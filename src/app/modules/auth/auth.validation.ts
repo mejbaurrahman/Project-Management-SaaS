@@ -6,7 +6,7 @@ const registerValidationSchema = z.object({
     .min(2, "Name must be at least 2 characters")
     .max(100, "Name must not exceed 100 characters"),
 
-  email: z.string().email("Please provide a valid email address"),
+  email: z.string().email("Valid email is required"),
 
   password: z
     .string()
@@ -15,9 +15,18 @@ const registerValidationSchema = z.object({
 });
 
 const loginValidationSchema = z.object({
-  email: z.string().email("Please provide a valid email address"),
+  email: z.string().email("Valid email is required"),
 
   password: z.string().min(1, "Password is required"),
+});
+
+const verifyOtpValidationSchema = z.object({
+  email: z.string().email("Valid email is required"),
+
+  otp: z
+    .string()
+    .length(6, "OTP must be exactly 6 digits")
+    .regex(/^\d{6}$/, "OTP must contain only numbers"),
 });
 
 const refreshTokenValidationSchema = z.object({
@@ -31,6 +40,7 @@ const googleLoginValidationSchema = z.object({
 export const AuthValidation = {
   registerValidationSchema,
   loginValidationSchema,
+  verifyOtpValidationSchema,
   refreshTokenValidationSchema,
   googleLoginValidationSchema,
 };

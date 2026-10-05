@@ -12,21 +12,29 @@ const router = Router();
 // Create task
 router.post(
   "/",
-  checkAuth(UserRole.MEMBER),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(TaskValidation.createTaskValidationSchema),
   TaskController.createTask,
 );
 
 // Get tasks
-router.get("/", checkAuth(), TaskController.getTasks);
+router.get(
+  "/",
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
+  TaskController.getTasks,
+);
 
 // Get task by id
-router.get("/:id", checkAuth(), TaskController.getTaskById);
+router.get(
+  "/:id",
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
+  TaskController.getTaskById,
+);
 
 // Update task
 router.patch(
   "/:id",
-  checkAuth(),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(TaskValidation.updateTaskValidationSchema),
   TaskController.updateTask,
 );
@@ -34,12 +42,16 @@ router.patch(
 // Update task status
 router.patch(
   "/:id/status",
-  checkAuth(),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(TaskValidation.updateTaskStatusValidationSchema),
   TaskController.updateTaskStatus,
 );
 
 // Soft delete task
-router.delete("/:id", checkAuth(), TaskController.softDeleteTask);
+router.delete(
+  "/:id",
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
+  TaskController.softDeleteTask,
+);
 
 export const TaskRoutes = router;

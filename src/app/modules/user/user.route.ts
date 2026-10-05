@@ -9,11 +9,15 @@ import { UserValidation } from "./user.validation.js";
 const router = Router();
 
 // Logged-in user routes
-router.get("/me", checkAuth(), UserController.getMyProfile);
+router.get(
+  "/me",
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
+  UserController.getMyProfile,
+);
 
 router.patch(
   "/me",
-  checkAuth(),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(UserValidation.updateProfileValidationSchema),
   UserController.updateMyProfile,
 );

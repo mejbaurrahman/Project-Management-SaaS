@@ -12,21 +12,29 @@ const router = Router();
 // Create sprint
 router.post(
   "/",
-  checkAuth(UserRole.MEMBER),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(SprintValidation.createSprintValidationSchema),
   SprintController.createSprint,
 );
 
 // Get sprints
-router.get("/", checkAuth(UserRole.MEMBER), SprintController.getSprints);
+router.get(
+  "/",
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
+  SprintController.getSprints,
+);
 
 // Get sprint by id
-router.get("/:id", checkAuth(UserRole.MEMBER), SprintController.getSprintById);
+router.get(
+  "/:id",
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
+  SprintController.getSprintById,
+);
 
 // Update sprint
 router.patch(
   "/:id",
-  checkAuth(UserRole.MEMBER),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(SprintValidation.updateSprintValidationSchema),
   SprintController.updateSprint,
 );
@@ -34,7 +42,7 @@ router.patch(
 // Update sprint status
 router.patch(
   "/:id/status",
-  checkAuth(UserRole.MEMBER),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(SprintValidation.updateSprintStatusValidationSchema),
   SprintController.updateSprintStatus,
 );

@@ -1,5 +1,4 @@
 import type { ErrorRequestHandler } from "express";
-
 import { ZodError } from "zod";
 
 import config from "../config/index.js";
@@ -11,9 +10,8 @@ export const globalErrorHandler: ErrorRequestHandler = (
   res,
   _next,
 ) => {
-  if (config.node_env === "development") {
-    console.error(err);
-  }
+  // Temporary debugging
+  console.error("🔥 GLOBAL ERROR:", err);
 
   let statusCode = 500;
   let message = "Something went wrong";
@@ -34,6 +32,13 @@ export const globalErrorHandler: ErrorRequestHandler = (
   } else if (err instanceof Error) {
     message =
       config.node_env === "development" ? err.message : "Something went wrong";
+  } else if (
+    config.node_env === "development" &&
+    typeof err === "object" &&
+    err !== null &&
+    "message" in err
+  ) {
+    message = String((err as { message: unknown }).message);
   }
 
   res.status(statusCode).json({

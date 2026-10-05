@@ -12,25 +12,29 @@ const router = Router();
 // Create project
 router.post(
   "/",
-  checkAuth(UserRole.MEMBER),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(ProjectValidation.createProjectValidationSchema),
   ProjectController.createProject,
 );
 
 // Get projects with pagination/filter/search/sort
-router.get("/", checkAuth(UserRole.MEMBER), ProjectController.getProjects);
+router.get(
+  "/",
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
+  ProjectController.getProjects,
+);
 
 // Get one project
 router.get(
   "/:id",
-  checkAuth(UserRole.MEMBER),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   ProjectController.getProjectById,
 );
 
 // Update project
 router.patch(
   "/:id",
-  checkAuth(UserRole.MEMBER),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(ProjectValidation.updateProjectValidationSchema),
   ProjectController.updateProject,
 );
@@ -38,7 +42,7 @@ router.patch(
 // Update project status
 router.patch(
   "/:id/status",
-  checkAuth(UserRole.MEMBER),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(ProjectValidation.updateProjectStatusValidationSchema),
   ProjectController.updateProjectStatus,
 );
@@ -46,7 +50,7 @@ router.patch(
 // Soft delete project
 router.delete(
   "/:id",
-  checkAuth(UserRole.MEMBER),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   ProjectController.softDeleteProject,
 );
 

@@ -1,12 +1,11 @@
 import { Router } from "express";
 
+import { checkAuth } from "../../middleware/checkAuth.js";
 import { validateRequest } from "../../middleware/validateRequest.js";
 
 import { AuthController } from "./auth.controller.js";
 import { AuthValidation } from "./auth.validation.js";
-
-import { UserRole, UserStatus } from "../../../generated/prisma/enums.js";
-import { checkAuth } from "../../middleware/checkAuth.js";
+import { UserRole } from "../../../generated/prisma/enums.js";
 
 const router = Router();
 
@@ -17,9 +16,21 @@ router.post(
 );
 
 router.post(
+  "/register/verify-otp",
+  validateRequest(AuthValidation.verifyOtpValidationSchema),
+  AuthController.verifyRegisterOtp,
+);
+
+router.post(
   "/login",
   validateRequest(AuthValidation.loginValidationSchema),
   AuthController.loginUser,
+);
+
+router.post(
+  "/login/verify-otp",
+  validateRequest(AuthValidation.verifyOtpValidationSchema),
+  AuthController.verifyLoginOtp,
 );
 
 router.post(
@@ -30,7 +41,8 @@ router.post(
 
 router.get(
   "/me",
-  checkAuth(UserRole.ADMIN, UserRole.MANAGER, UserRole.MEMBER),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   AuthController.getMe,
 );
+
 export const AuthRoutes = router;

@@ -11,26 +11,38 @@ const router = Router();
 // Create comment
 router.post(
   "/",
-  checkAuth(),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(CommentValidation.createCommentValidationSchema),
   CommentController.createComment,
 );
 
 // Get comments
-router.get("/", checkAuth(), CommentController.getComments);
+router.get(
+  "/",
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
+  CommentController.getComments,
+);
 
 // Get comment by id
-router.get("/:id", checkAuth(), CommentController.getCommentById);
+router.get(
+  "/:id",
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
+  CommentController.getCommentById,
+);
 
 // Update comment
 router.patch(
   "/:id",
-  checkAuth(),
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
   validateRequest(CommentValidation.updateCommentValidationSchema),
   CommentController.updateComment,
 );
 
 // Soft delete comment
-router.delete("/:id", checkAuth(), CommentController.softDeleteComment);
+router.delete(
+  "/:id",
+  checkAuth(UserRole.MEMBER, UserRole.ADMIN, UserRole.MANAGER),
+  CommentController.softDeleteComment,
+);
 
 export const CommentRoutes = router;

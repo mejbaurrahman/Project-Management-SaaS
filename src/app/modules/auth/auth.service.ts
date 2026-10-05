@@ -1,13 +1,21 @@
 import bcrypt from "bcryptjs";
-import type { JwtPayload, SignOptions } from "jsonwebtoken";
 import httpStatus from "http-status";
-import config from "../../config/index.js";
-import { prisma } from "../../lib/prisma.js";
-import { AppError } from "../../utils/AppError.js";
 
-import type { TLoginPayload, TRegisterPayload } from "./auth.interface.js";
-import { jwtUtils } from "../../utils/jwt.js";
-import { UserStatus } from "../../../generated/prisma/enums.js";
+import config from "../../config";
+import { EmailUtils } from "../../lib/email";
+import { prisma } from "../../lib/prisma";
+import { redisClient } from "../../lib/redis";
+
+import { AppError } from "../../utils/AppError";
+import { JwtUtils } from "../../utils/jwt";
+import { OtpUtils } from "../../utils/otp";
+
+import type {
+  TLoginPayload,
+  TPendingRegistration,
+  TRegisterPayload,
+  TVerifyOtpPayload,
+} from "./auth.interface";
 
 const publicUserSelect = {
   id: true,
@@ -20,6 +28,10 @@ const publicUserSelect = {
   updatedAt: true,
 };
 
+// ========================================
+// REGISTER
+// ========================================
+
 const registerUser = async (payload: TRegisterPayload) => {
   const email = payload.email.trim().toLowerCase();
 
@@ -30,7 +42,10 @@ const registerUser = async (payload: TRegisterPayload) => {
   });
 
   if (existingUser) {
-    throw new AppError(409, "User with this email already exists");
+    throw new AppError(
+      httpStatus.CONFLICT,
+      "User already exists with this email",
+    );
   }
 
   const hashedPassword = await bcrypt.hash(
@@ -38,18 +53,121 @@ const registerUser = async (payload: TRegisterPayload) => {
     config.bcrypt_salt_rounds,
   );
 
+  const otp = OtpUtils.generateOtp();
+
+  const pendingRegistration: TPendingRegistration = {
+    name: payload.name.trim(),
+    email,
+    password: hashedPassword,
+  };
+
+  const otpKey = `register:otp:${email}`;
+
+  const dataKey = `register:data:${email}`;
+
+  await redisClient.set(otpKey, otp, {
+    EX: config.otp_expires_in,
+  });
+
+  await redisClient.set(dataKey, JSON.stringify(pendingRegistration), {
+    EX: config.otp_expires_in,
+  });
+
+  try {
+    await EmailUtils.sendOtpEmail(email, otp, "REGISTER");
+  } catch {
+    await redisClient.del([otpKey, dataKey]);
+
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to send registration OTP",
+    );
+  }
+
+  return {
+    email,
+    expiresIn: config.otp_expires_in,
+  };
+};
+
+// ========================================
+// VERIFY REGISTER OTP
+// ========================================
+
+const verifyRegisterOtp = async (payload: TVerifyOtpPayload) => {
+  const email = payload.email.trim().toLowerCase();
+
+  const otpKey = `register:otp:${email}`;
+
+  const dataKey = `register:data:${email}`;
+
+  const savedOtp = await redisClient.get(otpKey);
+
+  if (!savedOtp) {
+    throw new AppError(httpStatus.BAD_REQUEST, "OTP expired or not found");
+  }
+
+  if (savedOtp !== payload.otp) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP");
+  }
+
+  const pendingData = await redisClient.get(dataKey);
+
+  if (!pendingData) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Registration session expired");
+  }
+
+  const registrationData = JSON.parse(pendingData) as TPendingRegistration;
+
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (existingUser) {
+    await redisClient.del([otpKey, dataKey]);
+
+    throw new AppError(
+      httpStatus.CONFLICT,
+      "User already exists with this email",
+    );
+  }
+
   const user = await prisma.user.create({
     data: {
-      name: payload.name,
-      email,
-      password: hashedPassword,
+      name: registrationData.name,
+
+      email: registrationData.email,
+
+      password: registrationData.password,
     },
 
     select: publicUserSelect,
   });
 
-  return user;
+  await redisClient.del([otpKey, dataKey]);
+
+  const jwtPayload = {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+  };
+
+  const accessToken = JwtUtils.createAccessToken(jwtPayload);
+
+  const refreshToken = JwtUtils.createRefreshToken(jwtPayload);
+
+  return {
+    user,
+    accessToken,
+    refreshToken,
+  };
 };
+
+// ========================================
+// LOGIN
+// ========================================
 
 const loginUser = async (payload: TLoginPayload) => {
   const email = payload.email.trim().toLowerCase();
@@ -61,67 +179,130 @@ const loginUser = async (payload: TLoginPayload) => {
   });
 
   if (!user) {
-    throw new AppError(404, "User not found");
-  }
-
-  if (user.status === "BLOCKED") {
-    throw new AppError(403, "User is blocked");
+    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid email or password");
   }
 
   if (user.deletedAt) {
-    throw new AppError(403, "User is deleted");
+    throw new AppError(httpStatus.FORBIDDEN, "User account is deleted");
+  }
+
+  if (user.status === "BLOCKED") {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Your account has been blocked. Please contact support.",
+    );
   }
 
   if (!user.password) {
-    throw new AppError(400, "This account uses Google login");
+    throw new AppError(httpStatus.BAD_REQUEST, "Please login using Google");
   }
 
   const passwordMatched = await bcrypt.compare(payload.password, user.password);
 
   if (!passwordMatched) {
-    throw new AppError(401, "Invalid credentials");
+    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid email or password");
   }
+
+  const otp = OtpUtils.generateOtp();
+
+  const otpKey = `login:otp:${email}`;
+
+  await redisClient.set(otpKey, otp, {
+    EX: config.otp_expires_in,
+  });
+
+  try {
+    await EmailUtils.sendOtpEmail(email, otp, "LOGIN");
+  } catch {
+    await redisClient.del(otpKey);
+
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to send login OTP",
+    );
+  }
+
+  return {
+    email,
+    expiresIn: config.otp_expires_in,
+  };
+};
+
+// ========================================
+// VERIFY LOGIN OTP
+// ========================================
+
+const verifyLoginOtp = async (payload: TVerifyOtpPayload) => {
+  const email = payload.email.trim().toLowerCase();
+
+  const otpKey = `login:otp:${email}`;
+
+  const savedOtp = await redisClient.get(otpKey);
+
+  if (!savedOtp) {
+    throw new AppError(httpStatus.BAD_REQUEST, "OTP expired or not found");
+  }
+
+  if (savedOtp !== payload.otp) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  if (user.deletedAt) {
+    throw new AppError(httpStatus.FORBIDDEN, "User account is deleted");
+  }
+
+  if (user.status === "BLOCKED") {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Your account has been blocked. Please contact support.",
+    );
+  }
+
+  await redisClient.del(otpKey);
 
   const jwtPayload = {
     userId: user.id,
-
     email: user.email,
-
     role: user.role,
   };
 
-  const accessToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwt_access_secret,
-    config.jwt_access_expires_in as SignOptions,
-  );
+  const accessToken = JwtUtils.createAccessToken(jwtPayload);
 
-  const refreshToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwt_refresh_secret,
-    config.jwt_refresh_expires_in as SignOptions,
-  );
+  const refreshToken = JwtUtils.createRefreshToken(jwtPayload);
 
   return {
     user: {
       id: user.id,
       name: user.name,
       email: user.email,
+      profilePhoto: user.profilePhoto,
       role: user.role,
       status: user.status,
     },
 
     accessToken,
-
     refreshToken,
   };
 };
+
+// ========================================
+// GET ME
+// ========================================
 
 const getMe = async (userId: string) => {
   const user = await prisma.user.findFirst({
     where: {
       id: userId,
-
       deletedAt: null,
     },
 
@@ -129,71 +310,67 @@ const getMe = async (userId: string) => {
   });
 
   if (!user) {
-    throw new AppError(404, "User not found");
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
 
   return user;
 };
 
-const refreshToken = async (token: string) => {
-  const verifiedRefreshToken = jwtUtils.verifyToken(
-    token,
-    config.jwt_refresh_secret,
-  );
+// ========================================
+// REFRESH TOKEN
+// ========================================
 
-  if (!verifiedRefreshToken.success || !verifiedRefreshToken.data) {
+const refreshToken = async (refreshToken: string) => {
+  let decoded;
+
+  try {
+    decoded = JwtUtils.verifyRefreshToken(refreshToken);
+  } catch {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      config.node_env === "development"
-        ? verifiedRefreshToken.error
-        : "Invalid refresh token",
+      "Invalid or expired refresh token",
     );
   }
-
-  const data = verifiedRefreshToken.data as JwtPayload;
 
   const user = await prisma.user.findUnique({
-    where: { id: data.userId },
+    where: {
+      id: decoded.userId,
+    },
   });
 
-  if (!user || user.deletedAt || user.status !== UserStatus.ACTIVE) {
+  if (!user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not found");
+  }
+
+  if (user.deletedAt) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User account is deleted");
+  }
+
+  if (user.status === "BLOCKED") {
     throw new AppError(
-      httpStatus.UNAUTHORIZED,
-      "User is inactive or not found",
+      httpStatus.FORBIDDEN,
+      "Your account has been blocked. Please contact support.",
     );
   }
 
-  const jwtPayload = {
+  const accessToken = JwtUtils.createAccessToken({
     userId: user.id,
-    name: user.name,
     email: user.email,
     role: user.role,
-  };
-
-  const accessToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwt_access_secret,
-    config.jwt_access_expires_in as SignOptions,
-  );
-
-  const refreshToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwt_refresh_secret,
-    config.jwt_refresh_expires_in as SignOptions,
-  );
+  });
 
   return {
     accessToken,
-    refreshToken,
   };
 };
 
 export const AuthService = {
   registerUser,
+  verifyRegisterOtp,
 
   loginUser,
+  verifyLoginOtp,
 
   getMe,
-
   refreshToken,
 };
